@@ -12,6 +12,25 @@ def graph():
         r = json.load(f)
     return jsonify(r)
 
+@app.route("/author/<name>", methods=["GET", "POST", "PUT"])
+def author(name):
+    if name in se.author_index:
+        return jsonify(se.get_author_papers_list(name))
+    else:
+        rsp = {
+            "err_msg": "Author not found"
+        }
+        return jsonify(rsp)
+
+@app.route("/author/<name>/cooperation", methods=["GET", "POST", "PUT"])
+def author_cooperation(name):
+    if name in se.author_index:
+        return jsonify(se.get_author_cooperation_list(name))
+    else:
+        rsp = {
+            "err_msg": "Author not found"
+        }
+        return jsonify(rsp)
 
 @app.route("/search", methods=["GET", "POST", "PUT"])
 def query():

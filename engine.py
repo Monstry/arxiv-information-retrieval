@@ -9,10 +9,11 @@ analyzer = RegexTokenizer() | LowercaseFilter() | StopFilter()
 
 
 class SearchEngine(object):
-    def __init__(self, papers_list, tokens_list, inverted_index):
+    def __init__(self, papers_list, tokens_list, inverted_index, author_index):
         self.papers_list = papers_list
         self.tokens_list = tokens_list
         self.inverted_index = inverted_index
+        self.author_index = author_index
         self.papers_count = len(papers_list)
         self.avg_len = sum([t["length"]
                            for t in tokens_list]) / len(tokens_list)
@@ -145,6 +146,22 @@ class SearchEngine(object):
         return rsp[offset:offset+limit]
 
 
+    def get_author_papers_list(self, name):
+        rsp = []
+        for paper_id in self.author_index[name]:
+            rsp.append(self.papers_list[paper_id])
+        return rsp
+
+    def get_author_cooperation_list(self, name):
+        authors_dict = defaultdict(int)
+        for paper_id in self.author_index[name]:
+            authors_list = self.papers_list[paper_id]["authors"].split(',')
+            for author in authors_list:
+                if author != name:
+                    authors_dict[author] += 1
+        authors_dict = sorted(authors_dict.items(), key=lambda x:x[1], reverse=True)
+        return authors_dict
+
 # initialize and return search engine
 def get_search_engine():
     papers_list = preprocess.load_papers()
@@ -152,8 +169,10 @@ def get_search_engine():
         tokens_list = json.load(f)
     with open("data/small/inverted_index.json", 'r') as f:
         inverted_index = json.load(f)
+    with open("data/small/author_index.json", 'r') as f:
+        author_index = json.load(f)
 
-    return SearchEngine(papers_list, tokens_list, inverted_index)
+    return SearchEngine(papers_list, tokens_list, inverted_index, author_index)
 
 
 if __name__ == "__main__":
