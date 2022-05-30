@@ -3,6 +3,8 @@ import math
 import copy
 import preprocess
 import json
+import networkx as nx
+from networkx.drawing.nx_pydot import write_dot
 from pprint import pprint
 from whoosh.analysis import RegexTokenizer, LowercaseFilter, StopFilter
 analyzer = RegexTokenizer() | LowercaseFilter() | StopFilter()
@@ -162,10 +164,34 @@ class SearchEngine(object):
         authors_dict = sorted(authors_dict.items(), key=lambda x:x[1], reverse=True)
         return authors_dict
     
-    def get_author_cooperation_graph(self, name, depth):
+    # BFS search
+    def get_author_cooperation_graph(self, name, depth = 2):
+        G = nx.Graph()
+        q = [name]
+        scanned_authors = [] 
+        for i in range(depth):
+            new_q = []
+            while(len(q)>0):
+                name = q.pop()
+                if name in scanned_authors:
+                    continue
+                scanned_authors.append(name)
+                authors_list = self.get_author_cooperation_list(name)
+                authors_names_list = [x[0] for x in authors_list]
+                new_edges = [(name, x) for x in authors_names_list]
+                G.add_edges_from(new_edges)
+                new_q.extend(authors_names_list)
+            q = list(set(new_q) - set(scanned_authors))
+            
+        pos = nx.nx_agraph.graphviz_layout(G)
+        nx.draw(G, pos=pos)
+        write_dot(G, "tmp.dot")
         
+        f = open("tmp.dot", encoding="utf-8")
+        result = f.read()
+        f.close()
         
-        pass
+        return result
 
 
 

@@ -1,4 +1,5 @@
 /data/large
 /papers
 .vscode
+tmp.dot
 __pycache__

@@ -26,11 +26,13 @@ def author_cooperation(name):
     else:
         return jsonify({"err_msg": "Author not found"})
 
+depth_limit = 4
 @app.route("/author/<name>/cooperation_graph/<int:depth>", methods=["GET", "POST", "PUT"])
 def author_cooperation_graph(name, depth):
     if name in se.author_index:
-        return jsonify(se.get_author_cooperation_graph(name, depth))
-    else:
+        depth = max(depth, depth_limit)
+        return se.get_author_cooperation_graph(name, depth)
+    else: 
         return jsonify({"err_msg": "Author not found"})
 
 @app.route("/search", methods=["GET", "POST", "PUT"])
