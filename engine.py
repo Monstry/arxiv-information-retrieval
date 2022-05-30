@@ -1,3 +1,4 @@
+from collections import defaultdict, Counter
 import math
 import copy
 import preprocess
@@ -26,7 +27,7 @@ class SearchEngine(object):
     def TF_IDF(self, query_terms, doc):
         score_sum = 0
         for term in query_terms:
-            if term in doc["terms_seq"]:
+            if term in doc["tokens_cnt"].keys():
                 # Term Frequency
                 TF = doc["tokens_cnt"].get(term, 0) / doc["length"]
                 score = (1+math.log(TF))*self.IDF(term)
@@ -58,6 +59,37 @@ class SearchEngine(object):
             )
             score_sum += score
         return score_sum
+    
+    def get_doc_tfidf_dict(self, doc):
+        doc_tfidf_dict = defaultdict(float)
+        vector_len = 0
+        for term in doc["tokens_cnt"].keys():
+            doc_tfidf_dict[term] = self.TF_IDF([term], doc)
+            vector_len += doc_tfidf_dict[term] * doc_tfidf_dict[term]
+        vector_len = math.sqrt(vector_len)
+        # divide vector length
+        for term in doc["tokens_cnt"].keys():
+            doc_tfidf_dict[term] = doc_tfidf_dict[term] / vector_len
+        return doc_tfidf_dict
+
+    def get_query_tfidf_dict(self, query_terms):
+        cnt = Counter(query_terms)
+        cnt_dict = dict(cnt)
+        query_token = {
+            "terms_seq": query_terms,
+            "length": len(query_terms),
+            "tokens_cnt": cnt_dict,
+        }
+        return self.get_doc_tfidf_dict(query_token)
+
+    # Vector Space Model (VSM) https://en.wikipedia.org/wiki/Vector_space_model
+    def vsm(self, query_terms, doc):
+        doc_tfidf_dict = self.get_doc_tfidf_dict(doc)
+        query_tfidf_dict = self.get_query_tfidf_dict(query_terms)
+        score = 0
+        for key in query_tfidf_dict.keys():
+            score += (doc_tfidf_dict[key] * query_tfidf_dict[key])
+        return score        
 
     # find all papers which contains query_terms
     def get_candidate_papers_ids(self, query_terms):
@@ -83,6 +115,8 @@ class SearchEngine(object):
                 score = self.TF_IDF(query_terms, doc)
             elif score_strategy == "BM25_plus":
                 score = self.BM25_plus(query_terms, doc)
+            elif score_strategy == "vsm":
+                score = self.vsm(query_terms, doc)
             else:
                 score = self.BM25(query_terms, doc)
             data = copy.deepcopy(self.papers_list[paper_id])
