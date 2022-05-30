@@ -17,20 +17,21 @@ def author(name):
     if name in se.author_index:
         return jsonify(se.get_author_papers_list(name))
     else:
-        rsp = {
-            "err_msg": "Author not found"
-        }
-        return jsonify(rsp)
+        return jsonify({"err_msg": "Author not found"})
 
 @app.route("/author/<name>/cooperation", methods=["GET", "POST", "PUT"])
 def author_cooperation(name):
     if name in se.author_index:
         return jsonify(se.get_author_cooperation_list(name))
     else:
-        rsp = {
-            "err_msg": "Author not found"
-        }
-        return jsonify(rsp)
+        return jsonify({"err_msg": "Author not found"})
+
+@app.route("/author/<name>/cooperation_graph/<int:depth>", methods=["GET", "POST", "PUT"])
+def author_cooperation_graph(name, depth):
+    if name in se.author_index:
+        return jsonify(se.get_author_cooperation_graph(name, depth))
+    else:
+        return jsonify({"err_msg": "Author not found"})
 
 @app.route("/search", methods=["GET", "POST", "PUT"])
 def query():

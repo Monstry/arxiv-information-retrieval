@@ -161,6 +161,13 @@ class SearchEngine(object):
                     authors_dict[author] += 1
         authors_dict = sorted(authors_dict.items(), key=lambda x:x[1], reverse=True)
         return authors_dict
+    
+    def get_author_cooperation_graph(self, name, depth):
+        
+        
+        pass
+
+
 
 # initialize and return search engine
 def get_search_engine():
