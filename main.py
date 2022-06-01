@@ -12,6 +12,7 @@ def graph():
         r = json.load(f)
     return jsonify(r)
 
+# TODO: sort
 @app.route("/author/<name>", methods=["GET", "POST", "PUT"])
 def author(name):
     if name in se.author_index:
