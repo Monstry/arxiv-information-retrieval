@@ -16,25 +16,46 @@ def graph():
 @app.route("/author/<name>", methods=["GET", "POST", "PUT"])
 def author(name):
     if name in se.author_index:
-        return jsonify(se.get_author_papers_list(name))
+        return jsonify({
+            "code":200,
+            "msg": "",
+            "content":se.get_author_papers_list(name)
+            })
     else:
-        return jsonify({"err_msg": "Author not found"})
+        return jsonify({
+            "code": 404,
+            "msg": "Author not found"
+        })
 
 @app.route("/author/<name>/cooperation", methods=["GET", "POST", "PUT"])
 def author_cooperation(name):
     if name in se.author_index:
-        return jsonify(se.get_author_cooperation_list(name))
+        return jsonify({
+            "code":200,
+            "msg": "",
+            "content":se.get_author_cooperation_list(name)
+            })
     else:
-        return jsonify({"err_msg": "Author not found"})
+        return jsonify({
+            "code": 404,
+            "msg": "Author not found"
+        })
 
 depth_limit = 4
 @app.route("/author/<name>/cooperation_graph/<int:depth>", methods=["GET", "POST", "PUT"])
 def author_cooperation_graph(name, depth):
     if name in se.author_index:
         depth = max(depth, depth_limit)
-        return se.get_author_cooperation_graph(name, depth)
+        return jsonify({
+            "code":200,
+            "msg": "",
+            "content":se.get_author_cooperation_graph(name, depth)
+            })
     else: 
-        return jsonify({"err_msg": "Author not found"})
+        return jsonify({
+            "code": 404,
+            "msg": "Author not found"
+        })
 
 @app.route("/search", methods=["GET", "POST", "PUT"])
 def query():
@@ -57,7 +78,7 @@ def query():
     rk_startegy = request.args.get("rk_startegy") or "score"
 
     try:
-        desc_order = bool(request.args.get("desc_order")) or True
+        desc_order = bool(request.args.get("desc_order")=="True") or True
     except:
         desc_order = True
         
@@ -70,7 +91,11 @@ def query():
     rsp = se.query(query_str, score_strategy)
     rsp = se.filter(rsp, offset, limit, rk_startegy, desc_order, selected_areas)
     
-    return jsonify(rsp)
+    return jsonify({
+        "code":200,
+        "msg": "",
+        "content": rsp
+        })
 
 
 if __name__ == "__main__":
