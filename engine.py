@@ -152,6 +152,7 @@ class SearchEngine(object):
         rsp = []
         for paper_id in self.author_index[name]:
             rsp.append(self.papers_list[paper_id])
+        rsp.sort(key=lambda x: x["published"], reverse=True)
         return rsp
 
     def get_author_cooperation_list(self, name):

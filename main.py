@@ -77,12 +77,18 @@ def query():
     rk_startegy = request.args.get("rk_startegy") or "score"
 
     try:
-        desc_order = bool(request.args.get("desc_order")=="True") or True
+        desc_order_str = request.args.get("desc_order")
+        if desc_order_str == 'False':
+            desc_order = False
+        else:
+            desc_order = True
     except:
         desc_order = True
         
     try:
         selected_areas = list(request.args.get("selected_areas").split(',')) or []
+        if selected_areas == ['']:
+            selected_areas = []
     except:
         selected_areas = []
     
