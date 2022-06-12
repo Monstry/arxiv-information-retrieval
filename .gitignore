@@ -3,3 +3,4 @@
 .vscode
 tmp.dot
 __pycache__
+/static/papers_pdf

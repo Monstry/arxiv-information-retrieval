@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from engine import get_search_engine
 import json
+import os
+import wget
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -101,6 +103,23 @@ def query():
         "msg": "",
         "content": rsp
         })
+
+@app.route("/getpdf", methods=["GET", "POST", "PUT"])
+def get_pdf():
+    pdf_url = request.args.get("url")
+    pdf_name = request.args.get("name")
+    
+    exists_flag = os.path.exists("./static/papers_pdf/{}".format(pdf_name))
+
+    if not exists_flag:
+        path = "./static/papers_pdf/{}".format(pdf_name)
+        wget.download(pdf_url, path)
+    
+    return jsonify({
+        "code":200,
+        "msg": "exist",
+    })
+
 
 
 if __name__ == "__main__":
