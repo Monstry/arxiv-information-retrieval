@@ -184,17 +184,56 @@ class SearchEngine(object):
                 new_q.extend(authors_names_list)
             q = list(set(new_q) - set(scanned_authors))
             
-        pos = nx.nx_agraph.graphviz_layout(G)
-        nx.draw(G, pos=pos)
-        write_dot(G, "tmp.dot")
+            
+        # # old version (dot format)
+        # pos = nx.nx_agraph.graphviz_layout(G)
+        # nx.draw(G, pos=pos)
+        # write_dot(G, "tmp.dot")
         
-        f = open("tmp.dot", encoding="utf-8")
-        result = f.read()
-        f.close()
+        # f = open("tmp.dot", encoding="utf-8")
+        # result = f.read()
+        # f.close()
         
-        return result
+        # return result
+        
+        # # new version (JSON format)
+        # nodes = {}
+        # edges = {}
+        
+        # for name in G.nodes:
+        #     nodes[name] = {"name":name}
+        
+        # for i, edge in enumerate(G.edges):
+        #     edges["edge{}".format(i)] = {
+        #         "source": edge[0],
+        #         "target": edge[1]
+        #     }
+        
+        # return {
+        #     "nodes": nodes,
+        #     "edges": edges
+        # }
+        
+        node_list = []
+        nodes_name_2_id = {}
+        for i, name in enumerate(G.nodes):
+            node_list.append({
+                "id": i,
+                "label": name
+            })
+            nodes_name_2_id[name] = i
 
+        edge_list = []
+        for edge in G.edges:
+            edge_list.append({
+                "from": nodes_name_2_id[edge[0]],
+                "to": nodes_name_2_id[edge[1]]
+            })
 
+        return {
+            "node_list": node_list,
+            "edge_list": edge_list
+        }
 
 # initialize and return search engine
 def get_search_engine():
